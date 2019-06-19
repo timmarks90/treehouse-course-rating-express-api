@@ -14,11 +14,14 @@ const ReviewSchema = new Schema({
       // user collection
     },
     postedOn: {
-        //date
+        type: Date,
+        default: Date.now
     },
     rating: {
         type: Number,
-        require: true
+        require: true,
+        min: 1,
+        max: 5
     },
     review: {
         type: String

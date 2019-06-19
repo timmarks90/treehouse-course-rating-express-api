@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 // db Schema
 const Schema = mongoose.Schema;
@@ -24,6 +25,17 @@ const UserSchema = new Schema({
     }
 });
 
-const User = mongoose.model("User", UserSchema);
+// Hash password before saving to db
+UserSchema.pre('save', (next) => {
+  const user = this;
+  bcrypt.hash(user.password, 10, (err, hash) => {
+    if (err) {
+      return next(err);
+    }
+    user.password = hash;
+    next();
+  })
+})
 
+const User = mongoose.model("User", UserSchema);
 module.exports.User = User;

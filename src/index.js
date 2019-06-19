@@ -4,11 +4,13 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const routes = require('../routes/index.js');
+const bodyParser = require("body-parser");
 
 const app = express();
 
 // connect to mongo db
-mongoose.connect("mongodb://localhost:27017/course-api");
+mongoose.connect("mongodb://localhost:27017/course-api", { useNewUrlParser: true });
 
 // monitor mongo connection
 const db = mongoose.connection;
@@ -19,18 +21,18 @@ db.on("error", err => {
 
 db.once("open", () => {
   console.log("db connection successful");
-  
-  // Create models
-  const User = mongoose.model("User", UserSchema);
+});
 
-  db.close();
-})
-
-// set our port
-app.set('port', process.env.PORT || 5000);
+app.use(bodyParser.json());
 
 // morgan gives us http request logging
 app.use(morgan('dev'));
+
+// connect routes with api home route
+app.use('/api', routes);
+
+// set our port
+app.set('port', process.env.PORT || 5000);
 
 // TODO add additional routes here
 

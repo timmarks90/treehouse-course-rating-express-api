@@ -8,9 +8,7 @@ const Schema = mongoose.Schema;
   
 // User Schema
 const UserSchema = new Schema({
-    _id: {
-        //bcrypt
-    },
+    _id: Schema.Types.ObjectId,
     fullName: {
       type: String,
       required: true
@@ -24,6 +22,27 @@ const UserSchema = new Schema({
       required: true
     }
 });
+
+// authenticate input against db
+UserSchema.statics.authenticate = (email, password, callback) => {
+  User.findOne({ email: email })
+    .exec((err, user) => {
+      if (err) {
+        return callback(err);
+      } else if ( !user ) {
+        const err = new Error('User not found.');
+        err.status = 401;
+        return callback(err);
+      }
+      bcrypt.compare(password, user.password, (error, result) => {
+        if (result === true) {
+          return callback(null, user);
+        } else {
+          return callback();
+        }
+      });
+    });
+};
 
 // Hash password before saving to db
 UserSchema.pre('save', (next) => {

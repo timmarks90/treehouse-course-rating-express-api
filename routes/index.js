@@ -1,22 +1,17 @@
-'use strict';
-
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user').User;
 const Course = require('../models/course').Course;
+const Review = require('../models/review').Review;
 const authenticateUser = require('../middleware').authenticateUser;
 
 // *** USER ROUTES *** //
 
 //GET /api/users
-router.get('/users', authenticateUser, (req, res, next) => {
-    // return currently authenticated user
-    const user = req.currentUser;
-
-    res.json({
-        name: user.name,
-        username: user.username,
-    });
+router.get('/users', (req, res, next) => {
+    console.log(req.params);
+    console.log('params above');
+    console.log(req.currentUser);
     res.status(200);
     res.json({response: "You sent me a GET request"});
 });
@@ -32,7 +27,7 @@ router.post('/users', (req, res, next) => {
             res.status(201);
             res.set("Location", "/");
         }
-    })
+    });
 });
 
 // *** COURSE ROUTES *** //
@@ -50,7 +45,7 @@ router.get('/courses', (req, res, next) => {
                 title: req.params.title
             });        
         }
-    })
+    });
 });
 
 // GET /api/course/:courseId
@@ -63,7 +58,7 @@ router.get('/courses/:courseId', (req, res, next) => {
             res.status(200);
             res.json(courses);        
         }
-    })
+    });
 });
 
 //POST /api/courses
@@ -77,7 +72,7 @@ router.post('/courses', authenticateUser, (req, res, next) => {
             res.status(201);
             res.set("Location", "/");
         }
-    })
+    });
 });
 
 //PUT /api/courses/:courseId
@@ -86,12 +81,12 @@ router.put('/courses/:courseId', authenticateUser, (req, res, next) => {
     req.course.update(req.body, (err, result) => {
         if(err) {
             err.status = 400;
-            return next(err)
+            return next(err);
         } else {
             res.status = 204; // 204 code = returns no content
             res.json(result);
         }
-    })
+    });
 });
 
 //POST /api/courses/:courseId/reviews
@@ -105,7 +100,7 @@ router.post('/courses/:courseId/reviews', authenticateUser, (req, res, next) => 
             res.status(201);
             res.set("Location", "/");
         }
-    })
+    });
 });
 
 module.exports = router;

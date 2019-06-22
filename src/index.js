@@ -1,10 +1,8 @@
-'use strict';
-
 // load modules
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
-const routes = require('../routes/index.js');
+const routes = require('../routes');
 const bodyParser = require("body-parser");
 
 const app = express();
@@ -17,7 +15,7 @@ const db = mongoose.connection;
 
 db.on("error", err => {
   console.error("Connection error:", err);
-})
+});
 
 db.once("open", () => {
   console.log("db connection successful");
@@ -52,8 +50,8 @@ app.get('/', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     message: 'Route Not Found'
-  })
-})
+  });
+});
 
 // global error handler
 app.use((err, req, res, next) => {

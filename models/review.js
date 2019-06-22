@@ -1,5 +1,3 @@
-'use strict';
-
 const mongoose = require('mongoose');
 
 // db Schema
@@ -7,7 +5,6 @@ const Schema = mongoose.Schema;
   
 // Review Schema
 const ReviewSchema = new Schema({
-    _id: Schema.Types.ObjectID,
     user: {
         type: Schema.Types.ObjectId,
         ref: "User"    
@@ -29,4 +26,4 @@ const ReviewSchema = new Schema({
 
 const Review = mongoose.model("Review", ReviewSchema);
 
-module.exports.Review = Review;
+module.exports = Review;

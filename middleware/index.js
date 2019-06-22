@@ -1,38 +1,26 @@
 const auth = require('basic-auth');
-const bcrypt = require('bcrypt');
+const User = require("../models/user");
 
-const authenticateUser = (req, res, next) => {
-    let message = null;
-    
-    // Parse the user's credentials from the Authorization header.
-    const credentials = auth(req);
-    
+const authenticateUser = (req, res, next) => {    
+    const credentials = auth(req);  
     // If the user's credentials are available...
     if (credentials) {
-        const user = user.find(u => u.username === credentials.name);
-
-        if (user) {
-            const authenticated = bcrypt.compareSync(credentials.pass, user.password);
-            
-            if(authenticated) {
-                console.log(`Authentication successful for username: ${user.username}`);
+        User.authenticate(credentials.name, credentials.password, (err, user) => {
+            if (err) {
+                return next(err);
+            } else if (!user) {
+                const err = new Error(`User not found for: ${user.name}`)
+                err.status = 401;
+                return next(err);
+            } else if (user) {
                 req.currentUser = user;
-            } else {
-                message = `Authentication failure for username: ${user.username}`;
+                return next();
             }
-        } else {
-            message = `User not found for username: ${credentials.name}`;
-        }
+        });
     } else {
-        message = 'Auth header not found';
-    }
-
-    if (message) {
-        console.warn(message);
-        // Return a response with a 401 Unauthorized HTTP status code.
-        res.status(401).json({ message: 'Access Denied' });
-    } else {
-        next();
+        const err = new Error('Auth header not found');
+        err.status = 401;
+        return next(err);
     }
 };
 

@@ -1,5 +1,3 @@
-'use strict';
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
@@ -11,7 +9,6 @@ const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+")
   
 // User Schema
 const UserSchema = new Schema({
-    _id: Schema.Types.ObjectId,
     fullName: {
       type: String,
       required: true
@@ -59,8 +56,8 @@ UserSchema.pre('save', (next) => {
     }
     user.password = hash;
     next();
-  })
-})
+  });
+});
 
 const User = mongoose.model("User", UserSchema);
-module.exports.User = User;
+module.exports = User;

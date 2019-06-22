@@ -1,13 +1,11 @@
-'use strict';
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
   
 // Course Schema
 const CourseSchema = new Schema({
-    _id: Schema.Types.ObjectId,
     user: {
-      _id: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
+      ref: "User"    
     },
     title: {
       type: String,
@@ -24,13 +22,28 @@ const CourseSchema = new Schema({
       type: String,
     },
     steps: [
-      // array
+      {
+        stepNumber: {
+          type: Number
+        },
+        title: {
+          type: String,
+          required: true
+        },
+        description: {
+          type: String,
+          required: true
+        }
+      }
     ],
     reviews: [
-      // array
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review"
+      }
     ],
 });
 
 const Course = mongoose.model("Course", CourseSchema);
 
-module.exports.Course = Course;
+module.exports = Course;

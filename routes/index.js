@@ -4,12 +4,19 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user').User;
 const Course = require('../models/course').Course;
+const authenticateUser = require('../middleware').authenticateUser;
 
 // *** USER ROUTES *** //
 
 //GET /api/users
-router.get('/users', (req, res, next) => {
+router.get('/users', authenticateUser, (req, res, next) => {
     // return currently authenticated user
+    const user = req.currentUser;
+
+    res.json({
+        name: user.name,
+        username: user.username,
+    });
     res.status(200);
     res.json({response: "You sent me a GET request"});
 });
@@ -24,7 +31,6 @@ router.post('/users', (req, res, next) => {
         } else {
             res.status(201);
             res.set("Location", "/");
-            return res.end();
         }
     })
 });
@@ -56,13 +62,12 @@ router.get('/courses/:courseId', (req, res, next) => {
         } else {
             res.status(200);
             res.json(courses);        
-            return res.end();
         }
     })
 });
 
 //POST /api/courses
-router.post('/users', (req, res, next) => {
+router.post('/courses', authenticateUser, (req, res, next) => {
     // Creates a course, sets the Location header, and returns no content
     Course.create(userData, (error, user) => {
         if (error) {
@@ -71,7 +76,34 @@ router.post('/users', (req, res, next) => {
         } else {
             res.status(201);
             res.set("Location", "/");
-            return res.end();
+        }
+    })
+});
+
+//PUT /api/courses/:courseId
+router.put('/courses/:courseId', authenticateUser, (req, res, next) => {
+    // Updates a course and returns no content
+    req.course.update(req.body, (err, result) => {
+        if(err) {
+            err.status = 400;
+            return next(err)
+        } else {
+            res.status = 204; // 204 code = returns no content
+            res.json(result);
+        }
+    })
+});
+
+//POST /api/courses/:courseId/reviews
+router.post('/courses/:courseId/reviews', authenticateUser, (req, res, next) => {
+    // Creates a review for the specified course ID, sets the Location header to the related course, and returns no content
+    Course.create(userData, (error, user) => {
+        if (error) {
+            error.status = 400;
+            return next(error);
+        } else {
+            res.status(201);
+            res.set("Location", "/");
         }
     })
 });

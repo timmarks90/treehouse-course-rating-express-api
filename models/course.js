@@ -1,17 +1,13 @@
 'use strict';
 
 const mongoose = require('mongoose');
-
-// db Schema
 const Schema = mongoose.Schema;
   
 // Course Schema
 const CourseSchema = new Schema({
-    _id: {
-        //bcrypt
-    },
+    _id: Schema.Types.ObjectId,
     user: {
-      // user collection
+      _id: Schema.Types.ObjectId,
     },
     title: {
       type: String,

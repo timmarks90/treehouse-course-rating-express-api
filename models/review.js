@@ -7,11 +7,10 @@ const Schema = mongoose.Schema;
   
 // Review Schema
 const ReviewSchema = new Schema({
-    _id: {
-        //bcrypt
-    },
+    _id: Schema.Types.ObjectID,
     user: {
-      // user collection
+        type: Schema.Types.ObjectId,
+        ref: "User"    
     },
     postedOn: {
         type: Date,

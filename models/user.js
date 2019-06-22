@@ -5,6 +5,9 @@ const bcrypt = require('bcrypt');
 
 // db Schema
 const Schema = mongoose.Schema;
+
+//email regex validation
+const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   
 // User Schema
 const UserSchema = new Schema({
@@ -15,7 +18,11 @@ const UserSchema = new Schema({
     },
     emailAddress: {
       type: String,
-      required: true
+      required: true,
+      unqiue: true,
+      validate: (value) => {
+        return validator.isEmail(value);
+      }
     },
     password: {
       type: String,
@@ -25,8 +32,7 @@ const UserSchema = new Schema({
 
 // authenticate input against db
 UserSchema.statics.authenticate = (email, password, callback) => {
-  User.findOne({ email: email })
-    .exec((err, user) => {
+  User.findOne({ email: email }).exec((err, user) => {
       if (err) {
         return callback(err);
       } else if ( !user ) {

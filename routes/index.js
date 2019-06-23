@@ -1,31 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/user').User;
+const User = require('../models/user');
 const Course = require('../models/course').Course;
 const Review = require('../models/review').Review;
 const authenticateUser = require('../middleware').authenticateUser;
 
+
 // *** USER ROUTES *** //
 
 //GET /api/users
-router.get('/users', (req, res, next) => {
-    console.log(req.params);
-    console.log('params above');
-    console.log(req.currentUser);
-    res.status(200);
-    res.json({response: "You sent me a GET request"});
+router.get('/users', authenticateUser, (req, res, next) => {
+    // Returns the currently authenticated user
+    User.find({}, null, (err, users) => {
+        if(err) {
+            return next(err);
+        } else {
+            res.json(users);        
+        }
+    });
 });
 
 //POST /api/users
 router.post('/users', (req, res, next) => {
     // Creates a user, sets the Location header to "/", and returns no content
-    User.create(userData, (error, user) => {
-        if (error) {
-            error.status = 400;
-            return next(error);
+    User.create(userData, (err, user) => {
+        if (err) {
+            err.status = 400;
+            return next(err);
         } else {
             res.status(201);
-            res.set("Location", "/");
+            res.location("/");
+            res.json({
+                response: "post request",
+                body: req.body
+            });
         }
     });
 });
@@ -39,11 +47,7 @@ router.get('/courses', (req, res, next) => {
         if(err) {
             return next(err);
         } else {
-            res.json({
-                response: "Hey courses",
-                courseId: req.params.id,
-                title: req.params.title
-            });        
+            res.json(courses);        
         }
     });
 });
@@ -51,14 +55,22 @@ router.get('/courses', (req, res, next) => {
 // GET /api/course/:courseId
 router.get('/courses/:courseId', (req, res, next) => {
     // Returns all Course properties and related documents for the provided course ID
-    Course.findById(req.params.courseId, (err, courses) => {
-        if(err) {
-            return next(err);
-        } else {
-            res.status(200);
-            res.json(courses);        
-        }
-    });
+    Course.findById(req.params.courseId)
+        // return fullName of the related user on the course model and each review returned with the course model.
+        .populate({
+            path: "user",
+            select: "fullName",
+            model: "User"
+        })
+        .populate("reviews")
+        .exec((err, course) => { 
+    if (err) {
+        return next(err);
+    } else {
+        res.status(200);
+        res.json(course);
+    }
+  });
 });
 
 //POST /api/courses

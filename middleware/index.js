@@ -1,5 +1,5 @@
 const auth = require('basic-auth');
-const User = require("../models/user");
+const User = require('../models/user');
 
 const authenticateUser = (req, res, next) => {    
     const credentials = auth(req);  
@@ -9,7 +9,7 @@ const authenticateUser = (req, res, next) => {
             if (err) {
                 return next(err);
             } else if (!user) {
-                const err = new Error(`User not found for: ${user.name}`)
+                const err = new Error(`User not found`);
                 err.status = 401;
                 return next(err);
             } else if (user) {

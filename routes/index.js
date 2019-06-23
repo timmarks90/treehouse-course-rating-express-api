@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const Course = require('../models/course').Course;
-const Review = require('../models/review').Review;
+const Course = require('../models/course');
+const Review = require('../models/review');
 const authenticateUser = require('../middleware').authenticateUser;
 
 
@@ -76,15 +76,17 @@ router.get('/courses/:courseId', (req, res, next) => {
 //POST /api/courses
 router.post('/courses', authenticateUser, (req, res, next) => {
     // Creates a course, sets the Location header, and returns no content
-    Course.create(userData, (error, user) => {
-        if (error) {
-            error.status = 400;
-            return next(error);
+    const course = new Course(req.body);
+    course.save(err => {
+        if(err) {
+            err.status = 400;
+            return next(err);
         } else {
+            res.location('/');
             res.status(201);
-            res.set("Location", "/");
+            res.end();
         }
-    });
+    })
 });
 
 //PUT /api/courses/:courseId

@@ -3,27 +3,20 @@ const router = express.Router();
 const User = require('../models/user');
 const Course = require('../models/course');
 const Review = require('../models/review');
-const authenticateUser = require('../middleware').authenticateUser;
-
+const userAuth = require('../middleware').authenticateUser;
 
 // *** USER ROUTES *** //
 
 //GET /api/users
-router.get('/users', authenticateUser, (req, res, next) => {
+router.get('/users', userAuth, (req, res, next) => {
     // Returns the currently authenticated user
-    User.find({}, null, (err, users) => {
-        if(err) {
-            return next(err);
-        } else {
-            res.json(users);        
-        }
-    });
+    res.json(req.currentUser);
 });
 
 //POST /api/users
 router.post('/users', (req, res, next) => {
     // Creates a user, sets the Location header to "/", and returns no content
-    User.create(userData, (err, user) => {
+    User.create(req.body, (err, user) => {
         if (err) {
             err.status = 400;
             return next(err);
@@ -74,7 +67,7 @@ router.get('/courses/:courseId', (req, res, next) => {
 });
 
 //POST /api/courses
-router.post('/courses', authenticateUser, (req, res, next) => {
+router.post('/courses', userAuth, (req, res, next) => {
     // Creates a course, sets the Location header, and returns no content
     const course = new Course(req.body);
     course.save(err => {
@@ -86,25 +79,27 @@ router.post('/courses', authenticateUser, (req, res, next) => {
             res.status(201);
             res.end();
         }
-    })
+    });
 });
 
 //PUT /api/courses/:courseId
-router.put('/courses/:courseId', authenticateUser, (req, res, next) => {
+router.put('/courses/:courseId', userAuth, (req, res, next) => {
     // Updates a course and returns no content
-    req.course.update(req.body, (err, result) => {
-        if(err) {
-            err.status = 400;
-            return next(err);
-        } else {
-            res.status = 204; // 204 code = returns no content
-            res.json(result);
-        }
+    Course.findById(req.params.courseId)
+        .update(req.body)
+        .exec((err, course) => {
+            if(err) {
+                err.status = 400;
+                return next(err);
+            } else {
+                res.status = 204; // 204 code = returns no content
+                res.end();
+            }
     });
 });
 
 //POST /api/courses/:courseId/reviews
-router.post('/courses/:courseId/reviews', authenticateUser, (req, res, next) => {
+router.post('/courses/:courseId/reviews', userAuth, (req, res, next) => {
     // Creates a review for the specified course ID, sets the Location header to the related course, and returns no content
     Course.create(userData, (error, user) => {
         if (error) {

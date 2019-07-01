@@ -10,7 +10,15 @@ const userAuth = require('../middleware').authenticateUser;
 //GET /api/users
 router.get('/users', userAuth, (req, res, next) => {
     // Returns the currently authenticated user
-    res.json(req.currentUser);
+    const user = req.currentUser;
+    console.log(req);
+    console.log(user);
+    res.json({
+        name: user.name,
+        username: user.username,
+    });
+    res.status = 200;
+    return res.end();
 });
 
 //POST /api/users

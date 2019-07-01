@@ -24,30 +24,32 @@ const UserSchema = new mongoose.Schema({
 });
 
 // authenticate input against db
-UserSchema.statics.authenticate = (email, password, callback) => {
-  User.findOne({email: email}).exec((err, user) => {
-      if (err) {
-        return callback(err);
-      } else if ( !user ) {
-        const err = new Error('User not found.');
-        err.status = 401;
-        return callback(err);
-      }
-
-      bcrypt.compare(password, user.password, (error, result) => {
-        if (result === true) {
-          return callback(null, user);
-        } else {
-          return callback();
+UserSchema.statics.authenticate = function(email, password, callback) {
+  User.findOne({emailAddress: email})
+    .exec(function(err, user) {
+        if (err) {
+          return callback(err);
+        } else if ( !user ) {
+          const err = new Error('User not found.');
+          err.status = 401;
+          return callback(err);
         }
-      });
+        // validate user entered password against hash
+        bcrypt.compare(password, user.password, function(err, result) {
+          console.log(result);
+          if (result) {
+            return callback(null, user);
+          } else {
+            return callback();
+          }
+        });
     });
 };
 
 // Hash password before saving to db
 UserSchema.pre('save', function(next) {
   const user = this;
-  bcrypt.hash(user.password, 10, (err, hash) => {
+  bcrypt.hash(user.password, 10, function(err, hash) {
     if (err) {
       return next(err);
     }
@@ -57,4 +59,5 @@ UserSchema.pre('save', function(next) {
 });
 
 const User = mongoose.model("User", UserSchema);
+
 module.exports = User;

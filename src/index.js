@@ -10,7 +10,7 @@ const app = express();
 // connect to mongo db
 mongoose.connect("mongodb://localhost:27017/course-api", { useNewUrlParser: true });
 
-// monitor mongo connection
+// Connection to mongo db
 const db = mongoose.connection;
 
 db.on("error", err => {

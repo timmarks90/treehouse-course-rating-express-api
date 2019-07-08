@@ -15,7 +15,8 @@ const UserSchema = new mongoose.Schema({
       required: true,
       unqiue: true,
       validate: {
-        validator: value => emailRegex.test(value)  }
+        validator: value => emailRegex.test(value) 
+      }
     },
     password: {
       type: String,
@@ -35,9 +36,10 @@ UserSchema.statics.authenticate = function(email, password, callback) {
           return callback(err);
         }
         // validate user entered password against hash
-        bcrypt.compare(password, user.password, function(err, result) {
-          console.log(result);
-          if (result) {
+        bcrypt.compare(password, user.password, function(err, match) {
+          console.log(password);
+          console.log(user.password);
+          if (match) {
             return callback(null, user);
           } else {
             return callback();

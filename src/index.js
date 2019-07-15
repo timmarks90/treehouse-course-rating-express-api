@@ -21,7 +21,16 @@ db.once("open", () => {
   console.log("db connection successful");
 });
 
+// send a friendly greeting for the root route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to the Course Review API'
+  });
+});
+
+// send a friendly greeting for the root route
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // morgan gives us http request logging
 app.use(morgan('dev'));
@@ -33,13 +42,6 @@ app.use('/api', routes);
 app.set('port', process.env.PORT || 5000);
 
 // TODO add additional routes here
-
-// send a friendly greeting for the root route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to the Course Review API'
-  });
-});
 
 // uncomment this route in order to test the global error handler
 // app.get('/error', function (req, res) {
